@@ -604,8 +604,11 @@ class GaussianModel:
             self._features_rest = nn.Parameter(features_rest, requires_grad=True)
             self.features_rest_qa.scale = features_rest_scale
             self.features_rest_qa.zero_point = features_rest_zero_point
-            self.features_rest_qa.activation_post_process.min_val = features_rest.min()
-            self.features_rest_qa.activation_post_process.max_val = features_rest.max()
+            if features_rest.numel() > 0:
+                self.features_rest_qa.activation_post_process.min_val = features_rest.min()
+                self.features_rest_qa.activation_post_process.max_val = features_rest.max()
+            else:
+                self.features_rest_qa.disable_observer()
 
             features_dc_q = torch.from_numpy(state_dict["features_dc"]).int().cuda()
             features_dc_scale = torch.from_numpy(state_dict["features_dc_scale"]).cuda()
